@@ -1,6 +1,6 @@
 {
-  "versionCode": 13,
-  "versionName": "1.11",
-  "notes": "التنظيف والتطهير بسجل مين عمله · مدير وعمال · أزرار إلغاء الولادة والفطام.",
+  "versionCode": 15,
+  "versionName": "1.13",
+  "notes": "لزقة QR على كل بطارية تمسحها بالكاميرا · غلطة في حساب العلف اتصلحت · دوّر على أم بالاسم أو الرقم · زرار الحفظ في شاشة التجهيز رجع · شغّال على التابلت وبالعرض.",
   "url": "https://github.com/engsherifelzeer-lab/rabbit-farm-releases/releases/latest"
 }
