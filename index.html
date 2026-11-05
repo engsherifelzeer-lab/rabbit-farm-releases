@@ -107,6 +107,22 @@ section{padding:60px 0; border-top:1px solid var(--line)}
 .box{border-radius:var(--radius); padding:22px 24px; border:1px solid var(--line); background:var(--surface)}
 .box.warn{background:var(--warn-soft); border-color:var(--warn); color:var(--warn)}
 .box.warn b{color:var(--warn)}
+.tablewrap{overflow-x:auto; margin-top:14px; border:1px solid var(--line);
+  border-radius:var(--radius); background:var(--surface)}
+table.prices{border-collapse:collapse; width:100%; font-size:15px}
+table.prices th,table.prices td{padding:11px 12px; text-align:center; white-space:nowrap}
+table.prices thead th{background:var(--surface-2); font-size:13px; color:var(--ink-2);
+  font-weight:700; border-bottom:1px solid var(--line)}
+table.prices tbody tr{border-bottom:1px solid var(--line)}
+table.prices tbody tr:last-child{border-bottom:0}
+table.prices tbody tr.free{background:var(--accent-soft)}
+table.prices tbody tr.hit{background:var(--warn-soft); outline:2px solid var(--warn)}
+table.prices td.amt{font-weight:800; font-size:16px}
+table.prices td.per{color:var(--ink-2); font-size:13.5px}
+table.prices td.pay{color:var(--ink-2); font-size:12.5px}
+.calc-hit{background:var(--accent-soft); color:var(--accent-ink);
+  border:1px solid var(--accent); border-radius:var(--radius); padding:14px 16px}
+.calc-hit b.big{font-size:22px; font-family:var(--font-display); display:block}
 .box.good{background:var(--accent-soft); border-color:var(--accent); color:var(--accent-ink)}
 .box h3{margin-bottom:8px}
 .box p:last-child{margin:0}
@@ -171,7 +187,7 @@ footer a{font-weight:700}
 <section class="hero">
   <div class="wrap hero-grid">
     <div>
-      <div class="pill">🔓 نسخة ما قبل الإطلاق — مجانية ٩٠ يوم، وبعدها مش بتتقفل</div>
+      <div class="pill">🔓 مفتوح ٩٠ يوم — وبعدها ١٠ أمهات مجاني مدى الحياة</div>
       <h1>مزرعتك في جيبك،<br>وشغّالة من غير نت</h1>
       <p class="lead">
         برنامج بيحسب مواعيد الجس والولادة والفطام والتحصين <b>لوحده</b>،
@@ -397,42 +413,96 @@ footer a{font-weight:700}
 <section id="price">
   <div class="wrap narrow">
     <div class="eyebrow">السعر</div>
-    <h2>مجاني ٩٠ يوم — وبياناتك مش محبوسة بعدها</h2>
+    <h2>ادفع مرة واحدة. البرنامج يبقى ملكك.</h2>
     <p class="lead">
-      البرنامج مفتوح بالكامل <b>٩٠ يوم من أول تشغيل</b>، والعدّاد قدامك فوق في كل شاشة من أول يوم.
+      مفيش اشتراك شهري ومفيش حاجة بتتجدد وراك. تختار عدد الأمهات اللي يناسبك،
+      تدفع مرة، والبرنامج شغال <b>مدى الحياة</b> على العدد ده.
     </p>
-    <div class="box good">
-      <h3>ولما الفترة تخلص؟</h3>
-      <p><b>٣ أمهات وذكر واحد أو أقل</b> ← البرنامج يفضل شغال عادي، <b>مجاني ليك للأبد</b>.
-        دي نسخة اللي بيربّي في البيت لنفسه.</p>
-      <p style="margin:0"><b>أكتر من كده</b> ← البرنامج يبقى <b>عرض فقط</b>: بياناتك كلها قدامك
-        والنسخة الاحتياطية شغالة، بس مفيش تسجيل جديد.</p>
+
+    <!-- ===== الحاسبة ===== -->
+    <div class="box" style="border-color:var(--accent)">
+      <h3 style="margin-bottom:10px">عندك كام أم؟</h3>
+      <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap">
+        <!-- type="text" مش number: خانة الأرقام في المتصفح بترمي الأرقام
+             العربية (٣٠) وبتسيب الخانة فاضية، فالمزارع اللي كيبورده عربي
+             مكانش هيطلعله أي نتيجة. -->
+        <input id="doe-input" type="text" inputmode="numeric" maxlength="5"
+               placeholder="مثلاً ٣٠"
+               style="font:inherit; font-size:17px; padding:11px 14px; border-radius:10px;
+                      border:1px solid var(--line); width:150px; background:var(--surface);
+                      color:var(--ink)">
+        <span style="color:var(--ink-2); font-size:14px">واكتب الرقم وهقولك الباقة</span>
+      </div>
+      <div id="calc-out" style="margin-top:14px"></div>
     </div>
+
+    <!-- ===== الباقات ===== -->
+    <h3 style="margin-top:28px">الباقات كلها</h3>
+    <p style="color:var(--ink-2); margin-top:4px">
+      كل باقة معاها ذكور كمان — <b>ذكر لكل ٥ أمهات</b>. والنسبة اللي بتحتاجها فعلاً
+      ذكر لكل ٨–١٠، يعني المساحة مريحة.
+    </p>
+
+    <div class="tablewrap">
+      <table class="prices" id="price-table">
+        <thead>
+          <tr><th>أمهات</th><th>ذكور</th><th>السعر</th><th>سعر الأم</th><th></th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- ===== يعني إيه الرقم ده ===== -->
+    <div class="box good" style="margin-top:22px">
+      <h3>طب ١٦ جنيه للأم دي كتير ولا قليل؟</h3>
+      <p>
+        <b>الأم الواحدة بتاكل علف بحوالي ٩٠ جنيه في الشهر</b> — ١٥٠ جرام في اليوم،
+        والشيكارة بألف جنيه. والمرضعة بصغارها بتاكل أضعاف كده.
+      </p>
+      <p>
+        <b>والبرنامج ١٦ جنيه للأم. مرة واحدة. وخلاص.</b>
+        يعني أقل من سدس أكل الأم في شهر واحد.
+      </p>
+      <p style="margin:0">
+        وبالأمهات نفسها: <b>باقة ٢٥ أم بأقل من تمن نص أم</b>.
+        وعلى أي مقاس، البرنامج بيكلفك <b>أقل من ٢٪ من تمن قطيعك</b>.
+      </p>
+    </div>
+
+    <!-- ===== المجاني ===== -->
+    <h3 style="margin-top:28px">والنسخة المجانية؟</h3>
+    <div class="box good" style="margin-top:10px">
+      <p>
+        <b>١٠ أمهات وذكرين — مجاني مدى الحياة.</b> مش فترة تجريبية، ومش بتنتهي.
+        لو بتربّي في البيت لنفسك، البرنامج ليك ببلاش وخلاص.
+      </p>
+      <p style="margin:0">
+        ودي مش نسخة ناقصة: المواعيد والتذكيرات والتحصينات والعلف والحساب والنسخة
+        الاحتياطية — <b>كلها شغالة</b>. العدد هو الفرق الوحيد.
+      </p>
+    </div>
+
     <div class="box" style="border-color:var(--accent); margin-top:14px">
       <p style="margin:0">
-        <b>ولو دخلت وضع العرض مش محبوس فيه:</b> نزّل القطيع لـ٣ أمهات
-        والبرنامج يرجع يشتغل على طول. والبرنامج بيحذّرك <b>قبلها بشهر</b> عشان تقرر وانت مرتاح.
+        <b>ولو كبرت عن العدد:</b> البرنامج بيحذّرك <b>قبلها بشهر</b>، وبعدين بيديك
+        <b>٣٠ يوم شغل كامل</b> عشان تقرر وانت مرتاح. مش بيتقفل في وشك فجأة.
       </p>
     </div>
-    <div class="box warn" style="margin-top:14px">
-      <p style="margin:0">
-        <b>وأقولها بصراحة:</b> البرنامج نفسه بينصحك بذكر تاني عشان تجنّب القرابة،
-        والنسخة المجانية بذكر واحد. فلو بتربّي بجد وعاوز تجدّد الدم، النسخة المجانية
-        مش هتكفيك — والكلام ده أحب تعرفه من الأول مش بعد ٩٠ يوم.
-      </p>
-    </div>
+
     <p style="margin-top:18px; color:var(--ink-2)">
       <b>وعمري ما هحبس بيانات حد عن شغله.</b> كل أم مسجّلة عندك بتفضل مكانها مهما حصل،
       والنسخة الاحتياطية شغالة دايمًا. دي قاعدة، مش عرض.
     </p>
-    <p style="margin-top:22px">
-      دي <b>نسخة ما قبل الإطلاق</b>، والسعر لسه مش متحدد — عشان عايز أسمع من اللي بيستخدموه الأول.
-    </p>
-    <div class="box" style="border-color:var(--accent)">
+
+    <div class="box" style="border-color:var(--accent); margin-top:14px">
       <p style="margin:0">
         🎁 <b>اللي بيجرّب معايا دلوقتي، ليه سعر خاص مثبّت لما البرنامج يطلع رسمي.</b>
       </p>
     </div>
+
+    <p style="margin-top:20px; text-align:center">
+      <a class="btn" href="https://wa.me/201110143617">كلّمني على واتساب ٠١١١٠١٤٣٦١٧</a>
+    </p>
   </div>
 </section>
 
@@ -584,7 +654,7 @@ footer a{font-weight:700}
   <div class="wrap">
     <div class="cta">
       <h2>نزّل البرنامج دلوقتي</h2>
-      <p>مجاني ٩٠ يوم · شغّال من غير نت · مفيش حساب ولا تسجيل دخول</p>
+      <p>١٠ أمهات مجاني مدى الحياة · شغّال من غير نت · مفيش حساب ولا تسجيل دخول</p>
       <a class="btn" href="https://github.com/engsherifelzeer-lab/rabbit-farm-releases/releases/latest">⬇️ نزّل RabbitFarm.apk</a>
       <ol class="steps">
         <li>اضغط الزرار فوق، ونزّل ملف <b>RabbitFarm.apk</b>.</li>
@@ -610,5 +680,102 @@ footer a{font-weight:700}
   </div>
 </footer>
 
+<script>
+(function () {
+  "use strict";
+  /* قايمة الباقات. الذكور = الأمهات ÷ ٥ في كل الباقات، والمجاني زيها بالظبط
+     (١٠ ÷ ٥ = ٢) — قاعدة واحدة من أول باقة لآخر واحدة. */
+  var TIERS = [
+    { does: 10,   price: 0,     free: true },
+    { does: 25,   price: 400 },
+    { does: 50,   price: 750 },
+    { does: 75,   price: 1100 },
+    { does: 100,  price: 1400 },
+    { does: 150,  price: 2050, split: true },
+    { does: 200,  price: 2700, split: true },
+    { does: 300,  price: 3900, split: true },
+    { does: 400,  price: 5100, split: true },
+    { does: 500,  price: 6200, split: true },
+    { does: 750,  price: 9000, split: true },
+    { does: 1000, price: 11500, split: true }
+  ];
+
+  function ar(n) {
+    return String(n).replace(/\d/g, function (d) { return "٠١٢٣٤٥٦٧٨٩"[+d]; });
+  }
+  function money(n) { return ar(n.toLocaleString("en-US")); }
+  function bucks(does) { return Math.round(does / 5); }
+  function perDoe(t) {
+    var v = t.price / t.does;
+    return (Math.round(v * 10) / 10).toFixed(1).replace(/\.0$/, "");
+  }
+
+  var tbody = document.querySelector("#price-table tbody");
+  if (tbody) {
+    tbody.innerHTML = TIERS.map(function (t) {
+      if (t.free) {
+        return '<tr class="free" data-does="10"><td><b>' + ar(10) + '</b></td><td>' + ar(2) +
+          '</td><td class="amt">مجاني</td><td class="per">—</td>' +
+          '<td class="pay">مدى الحياة</td></tr>';
+      }
+      return '<tr data-does="' + t.does + '"><td><b>' + ar(t.does) + '</b></td><td>' +
+        ar(bucks(t.does)) + '</td><td class="amt">' + money(t.price) +
+        '</td><td class="per">' + ar(perDoe(t)) + ' ج</td>' +
+        '<td class="pay">' + (t.split ? "دفعتين" : "مرة واحدة") + '</td></tr>';
+    }).join("");
+  }
+
+  /* الحاسبة: الفجوة بين الباقات مش نقص — دي مساحة تكبر فيها من غير ما تدفع تاني. */
+  var input = document.getElementById("doe-input");
+  var out = document.getElementById("calc-out");
+
+  function pick(count) {
+    for (var i = 0; i < TIERS.length; i++) if (TIERS[i].does >= count) return TIERS[i];
+    return null;
+  }
+  function show() {
+    if (!out) return;
+    var raw = (input.value || "").replace(/[\u0660-\u0669]/g, function (d) {
+      return String(d.charCodeAt(0) - 0x660);
+    });
+    var c = parseInt(raw, 10);
+    if (isNaN(c) || c < 1) { out.innerHTML = ""; mark(null); return; }
+    if (c > 1000) {
+      out.innerHTML = '<div class="calc-hit"><b class="big">أكتر من ألف أم</b>' +
+        'كلّمني على واتساب ونظبط حاجة على مقاسك.</div>';
+      mark(null); return;
+    }
+    var t = pick(c);
+    var room = t.does - c;
+    var html = '<div class="calc-hit">';
+    if (t.free) {
+      html += '<b class="big">مجاني مدى الحياة</b>' +
+        'عندك ' + ar(c) + ' أم، والنسخة المجانية لحد ' + ar(10) + ' أمهات وذكرين. ' +
+        '<b>مش هتدفع حاجة.</b>';
+      if (room > 0) html += '<br>ومعاك مساحة تكبر لحد ' + ar(10) + ' من غير ما تدفع.';
+    } else {
+      html += '<b class="big">باقة ' + ar(t.does) + ' أم — ' + money(t.price) + ' جنيه</b>' +
+        'معاها ' + ar(bucks(t.does)) + ' ذكر، ' +
+        (t.split ? 'وتقدر تدفعها على <b>دفعتين</b>' : 'بتتدفع <b>مرة واحدة</b>') +
+        ' — وملكك مدى الحياة.';
+      if (room > 0) {
+        html += '<br><b>ومعاك مساحة تكبر لحد ' + ar(t.does) + ' أم</b> من غير ما تدفع تاني.';
+      }
+      html += '<br><span style="opacity:.85">يعني ' + ar(perDoe(t)) +
+        ' جنيه للأم — والأم بتاكل علف بـ' + ar(90) + ' جنيه في الشهر.</span>';
+    }
+    html += "</div>";
+    out.innerHTML = html;
+    mark(t.does);
+  }
+  function mark(does) {
+    var rows = document.querySelectorAll("#price-table tbody tr");
+    for (var i = 0; i < rows.length; i++) {
+      rows[i].classList.toggle("hit", does !== null && +rows[i].dataset.does === does);
+    }
+  }
+  if (input) { input.addEventListener("input", show); }
+})();
+</script>
 </body>
 </html>
